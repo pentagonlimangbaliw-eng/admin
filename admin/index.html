@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+  <meta http-equiv="refresh" content="0; url=dashboard.html" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DreamSpace Admin Login</title>
+
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #584aac, #390861);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      color: #fff;
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 40px 32px;
+      border-radius: 16px;
+      width: 350px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.8s ease;
+    }
+
+    .login-container h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      letter-spacing: 1px;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 6px;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      font-size: 14px;
+      transition: box-shadow 0.2s ease;
+    }
+
+    input:focus {
+      box-shadow: 0 0 0 2px #00b4d8;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #0077b6, #00b4d8);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #023e8a, #0077b6);
+    }
+
+    .error {
+      color: #ffb3b3;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 400px) {
+      .login-container {
+        width: 90%;
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+   
+
+  <div class="login-container">
+    <h1>DreamSpace Admin</h1>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter your email" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter password" required />
+
+      <button type="submit" class="btn">Login</button>
+    </form>
+    <p id="errorMsg" class="error"></p>
+  </div>
+
+  <script src="scripts/api.js"></script>
+  <script src="scripts/auth.js"></script>
+  <script>
+window.catalog = {};
+
+catalog.loadItems = async function () {
+  const tbody = document.getElementById('itemsList');
+  tbody.innerHTML = `<tr><td colspan="4">Loading items…</td></tr>`;
+  try {
+    const data = await api.catalog.getItems();
+    if (!data || !data.length) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No items found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(item => `
+      <tr>
+        <td>${item.name}</td>
+        <td>${item.category}</td>
+        <td>${item.price ? item.price.toLocaleString() : '—'}</td>
+        <td>
+          <button class="action-btn edit-btn" onclick='catalog.editItem(${JSON.stringify(item)})'>Edit</button>
+          <button class="action-btn delete-btn" onclick="catalog.deleteItem('${item._id}')">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="4" style="color:red;">Failed to load items.</td></tr>`;
+    console.error(e);
+  }
+};
+
+catalog.addItem = function () {
+  catalog.editingId = null;
+  document.getElementById('modalTitle').innerText = "Add New Item";
+  ['itemName','itemDesc','itemCategory','itemPrice','itemImageUrl','itemPreviewImage','itemAssetBundleUrl']
+    .forEach(id => document.getElementById(id).value = "");
+  document.getElementById('itemLiked').value = "false";
+  document.getElementById('itemCategory').value = "tiles";
+  document.getElementById('addItemModal').classList.add('active');
+};
+
+catalog.editItem = function (item) {
+  catalog.editingId = item._id;
+  document.getElementById('modalTitle').innerText = "Edit Item";
+
+  document.getElementById('itemName').value = item.name || "";
+  document.getElementById('itemDesc').value = item.desc || "";
+  document.getElementById('itemCategory').value = item.category || "tiles";
+  document.getElementById('itemPrice').value = item.price || "";
+  document.getElementById('itemImageUrl').value = item.imageUrl || "";
+  document.getElementById('itemPreviewImage').value = item.previewImage || "";
+  document.getElementById('itemAssetBundleUrl').value = item.assetBundleUrl || "";
+  document.getElementById('itemLiked').value = item.liked ? "true" : "false";
+
+  document.getElementById('addItemModal').classList.add('active');
+};
+
+catalog.closeModal = function () {
+  document.getElementById('addItemModal').classList.remove('active');
+};
+
+catalog.saveItem = async function () {
+  const name = document.getElementById('itemName').value.trim();
+  const desc = document.getElementById('itemDesc').value.trim();
+  const category = document.getElementById('itemCategory').value;
+  const price = parseFloat(document.getElementById('itemPrice').value);
+  const imageUrl = document.getElementById('itemImageUrl').value.trim();
+  const previewImage = document.getElementById('itemPreviewImage').value.trim();
+  const assetBundleUrl = document.getElementById('itemAssetBundleUrl').value.trim();
+  const liked = document.getElementById('itemLiked').value === "true";
+
+  if (!name || !category || isNaN(price)) {
+    alert('Please fill in required fields correctly.');
+    return;
+  }
+
+  const payload = { name, desc, category, price, imageUrl, previewImage, assetBundleUrl, liked };
+
+  try {
+    if (catalog.editingId) {
+      await api.catalog.updateItem(catalog.editingId, payload);
+      alert('✅ Item updated successfully!');
+    } else {
+      await api.catalog.addItem(payload);
+      alert('✅ Item added successfully!');
+    }
+    catalog.closeModal();
+    catalog.loadItems();
+  } catch (e) {
+    console.error(e);
+    alert('❌ Failed to save item: ' + e.message);
+  }
+};
+
+catalog.deleteItem = async function (id) {
+  if (!confirm("Are you sure you want to delete this item?")) return;
+  try {
+    await api.catalog.deleteItem(id);
+    alert("🗑️ Item deleted successfully.");
+    catalog.loadItems();
+  } catch (e) {
+    console.error(e);
+    alert("❌ Failed to delete item: " + e.message);
+  }
+};
+
+async function initPage() {
+  try {
+    await catalog.loadItems();
+  } catch (err) {
+    console.error('Failed to load catalog:', err);
+  }
+}
+</script>
+
+  
+</body>
+</html>

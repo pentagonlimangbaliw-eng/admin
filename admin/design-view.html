@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Design View</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+  >
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: rgba(0,0,0,0.55);
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dialog {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      width: 90%;
+      max-width: 600px;
+      max-height: 85vh;
+      padding: 1.5rem 2rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes fadeOut { to { transform: scale(0.95); opacity: 0; } }
+
+    .dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .dialog-header h2 {
+      color: #372a7f;
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: #666;
+      transition: color 0.2s;
+    }
+    .close-btn:hover { color: #000; }
+
+    .dialog-content {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 0.3rem;
+    }
+
+    .design-preview {
+      border-radius: 8px;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      background-color: #eef0ff;
+      background-size: cover;
+      background-position: center;
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+
+    .details p { margin: 0.3rem 0; font-size: 0.9rem; color: #444; }
+    .details strong { color: #372a7f; }
+
+    .items {
+      background: #f8f9fd;
+      border-radius: 8px;
+      padding: 0.8rem;
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      color: #333;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 4px rgba(0,0,0,0.05);
+    }
+    pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
+
+    .footer { text-align: right; margin-top: 1rem; }
+    .btn {
+      background: #372a7f;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.25s;
+    }
+    .btn:hover { background: #2a1d6d; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #bbb; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #888; }
+
+    @media (max-width: 600px) {
+      .dialog { padding: 1.2rem; width: 95%; max-height: 90vh; }
+      .design-preview { height: 120px; font-size: 0.95rem; }
+    }
+  </style>
+
+  <script src="scripts/api.js"></script>
+  <script src="scripts/auth.js"></script>
+</head>
+
+<body onload="auth.requireAuth(); loadDesign();">
+
+  <div class="dialog" id="dialog">
+    <div class="dialog-header">
+      <h2 id="designTitle">Loading...</h2>
+      <button class="close-btn" onclick="closeDialog()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="dialog-content" id="dialogContent">
+      <p>Loading design data...</p>
+    </div>
+
+    <div class="footer">
+      <button class="btn" onclick="closeDialog()"><i class="bi bi-arrow-left"></i> Back</button>
+    </div>
+  </div>
+
+  <script>
+    async function loadDesign() {
+      const content = document.getElementById('dialogContent');
+      const title = document.getElementById('designTitle');
+      const params = new URLSearchParams(location.search);
+      const id = params.get('id');
+
+      if (!id) {
+        title.innerText = "Error";
+        content.innerHTML = '<p style="color:red;">No design ID provided.</p>';
+        return;
+      }
+
+      try {
+        const design = await api.designs.getById(id);
+        title.innerText = design.name || "Untitled Design";
+
+        const preview = design.screenshotUrl
+          ? `<div class="design-preview" style="background-image:url('${design.screenshotUrl}');">${design.roomType || ''}</div>`
+          : `<div class="design-preview">${design.roomType || "Preview"}</div>`;
+
+        const itemsHtml = design.items?.length
+          ? `<div class="items"><pre>${JSON.stringify(design.items, null, 2)}</pre></div>`
+          : `<div class="items"><p style="color:#555;">No items found.</p></div>`;
+
+        content.innerHTML = `
+          ${preview}
+          <div class="details">
+            <p><strong>User:</strong> ${design.userId?.name || "N/A"}</p>
+            <p><strong>Created:</strong> ${new Date(design.createdAt).toLocaleString()}</p>
+            <p><strong>Room Type:</strong> ${design.roomType || "Unknown"}</p>
+            <p><strong>ID:</strong> ${design._id}</p>
+          </div>
+          <h4 style="margin-top:1rem; color:#372a7f;">Items</h4>
+          ${itemsHtml}
+        `;
+      } catch (e) {
+        title.innerText = "Error";
+        content.innerHTML = `<p style="color:red;">Failed to load design: ${e.message}</p>`;
+      }
+    }
+
+    function closeDialog() {
+      const dialog = document.getElementById("dialog");
+      dialog.style.animation = "fadeOut 0.25s forwards";
+      setTimeout(() => window.history.back(), 250);
+    }
+  </script>
+</body>
+</html>

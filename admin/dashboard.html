@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DreamSpace Admin — Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Segoe UI",Arial,sans-serif;
+  display:flex;
+  height:100vh;
+  color:#222;
+  background:
+    linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)),
+    url("ImagesIcons/bg.jpg") no-repeat center center / cover;
+  background-attachment: fixed;
+}
+a{text-decoration:none;color:inherit}
+.sidebar{width:240px;background:linear-gradient(180deg,#5e4ad1,#372a7f);color:white;display:flex;flex-direction:column;padding:1.5rem 1rem;box-shadow:2px 0 10px rgba(0,0,0,.15)}
+.sidebar .brand{font-size:1.6rem;font-weight:700;text-align:center;margin-bottom:2rem;letter-spacing:.5px}
+.nav-links{flex:1;display:flex;flex-direction:column;gap:.25rem}
+.nav-links a{display:flex;align-items:center;gap:.75rem;padding:.8rem 1rem;border-radius:10px;color:#f4f4f4;font-weight:500;transition:background .25s,transform .15s}
+.nav-links a:hover{background:rgba(255,255,255,.15);transform:translateX(4px)}
+.nav-links a.active{background:rgba(255,255,255,.3);font-weight:600}
+.nav-links i{font-size:1.2rem;opacity:.9}
+.logout-btn{background:#ff4d4d;border:none;color:white;padding:.75rem;border-radius:10px;cursor:pointer;font-weight:600;transition:.25s;display:flex;align-items:center;justify-content:center;gap:.5rem;margin-top:auto}
+.logout-btn:hover{background:#c1121f;transform:scale(1.03)}
+.main{flex:1;overflow-y:auto;padding:2.5rem;animation:fadeIn .6s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+h1{color:#372a7f;margin-bottom:.5rem;font-size:1.8rem}
+.muted{color:#555;font-size:.95rem;margin-bottom:1.5rem}
+.cards-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.2rem;margin-bottom:2rem}
+.small-card{background:white;border-radius:14px;padding:1.5rem 1rem;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.08);transition:.25s;position:relative;overflow:hidden;cursor:pointer}
+.small-card::before{content:"";position:absolute;top:0;left:0;height:6px;width:100%;background:linear-gradient(90deg,#5e4ad1,#372a7f)}
+.small-card:hover{transform:translateY(-4px);box-shadow:0 5px 14px rgba(0,0,0,.15)}
+.small-card h3{margin:0;font-size:2rem;color:#584aac;margin-bottom:.3rem}
+.small-card span{color:#666;font-size:.9rem}
+.dashboard-grid{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem}
+.card{background:white;border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.1);transition:.25s}
+.card:hover{box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.card h2{margin-top:0;color:#584aac;border-bottom:2px solid #e3e3e3;padding-bottom:.5rem;margin-bottom:1rem;display:flex;align-items:center;gap:8px;font-size:1.2rem}
+.table{width:100%;border-collapse:collapse;margin-top:.5rem}
+.table th,.table td{padding:.7rem;text-align:left;border-bottom:1px solid #e3e3e3}
+.table th{color:#584aac;background:#f0f4fa;font-weight:600}
+.centered{text-align:center}
+.grid-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem;margin-top:1rem}
+.tile{display:block;background:linear-gradient(135deg,#584aac,#372a7f);color:white;padding:1rem;text-align:center;border-radius:10px;font-weight:500;transition:.25s;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.tile i{display:block;font-size:1.6rem;margin-bottom:.4rem}
+.tile:hover{background:linear-gradient(135deg,#6e5be9,#493b9c);transform:translateY(-3px)}
+footer{text-align:center;margin-top:2rem;color:#777;font-size:.9rem}
+@media(max-width:768px){body{flex-direction:column}.sidebar{width:100%;flex-direction:row;justify-content:space-between;align-items:center}.nav-links{flex-direction:row;gap:.5rem}.logout-btn{margin-top:0}.dashboard-grid{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+<aside class="sidebar">
+<div class="brand">DreamSpace Admin</div>
+<nav class="nav-links">
+<a href="dashboard.html" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<a href="catalog.html"><i class="bi bi-box-seam"></i> Catalog</a>
+<a href="quotes.html"><i class="bi bi-chat-left-text"></i> Quotes</a>
+<a href="designs.html"><i class="bi bi-palette2"></i> Designs</a>
+<a href="reset.html"><i class="bi bi-arrow-repeat"></i> Reset</a>
+</nav>
+<button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
+</aside>
+
+<main class="main">
+<h1>Welcome Back, Admin 👋</h1>
+<p class="muted">Here’s your current overview and latest updates.</p>
+
+<div class="cards-row">
+<div class="small-card" data-link="users.html"><h3 id="usersCount">--</h3><span>Active Users</span></div>
+<div class="small-card" data-link="quotes.html?status=pending"><h3 id="quotesCount">--</h3><span>Pending Quotes</span></div>
+<div class="small-card" data-link="designs.html"><h3 id="designsCount">--</h3><span>Saved Designs</span></div>
+<div class="small-card" data-link="catalog.html"><h3 id="catalogCount">--</h3><span>Catalog Items</span></div>
+</div>
+
+<div class="dashboard-grid">
+<section class="card">
+<h2><i class="bi bi-chat-square-dots"></i> Recent Quotes</h2>
+<table class="table">
+<thead><tr><th>ID</th><th>Status</th><th>Total</th><th>Date</th></tr></thead>
+<tbody id="recentQuotes"><tr><td colspan="4" class="muted centered">Loading…</td></tr></tbody>
+</table>
+</section>
+
+<section class="card">
+<h2><i class="bi bi-lightning-charge"></i> Quick Actions</h2>
+<div class="grid-tiles">
+<a href="catalog.html" class="tile"><i class="bi bi-box-seam"></i>Catalog</a>
+<a href="quotes.html" class="tile"><i class="bi bi-chat-left-text"></i>Quotes</a>
+<a href="designs.html" class="tile"><i class="bi bi-palette2"></i>Designs</a>
+<a href="reset.html" class="tile"><i class="bi bi-arrow-repeat"></i>Reset</a>
+</div>
+</section>
+</div>
+
+<footer>© 2025 DreamSpace Admin Dashboard</footer>
+</main>
+
+<script>
+const BASE_URL = 'https://dreamspace-backend.onrender.com';
+
+async function loadDashboardData(){
+  try {
+    const res = await fetch(`${BASE_URL}/api/dashboard-summary`);
+    const data = await res.json();
+    document.getElementById("usersCount").textContent = data.users ?? '0';
+    document.getElementById("quotesCount").textContent = data.quotes ?? '0';
+    document.getElementById("designsCount").textContent = data.designs ?? '0';
+    document.getElementById("catalogCount").textContent = data.catalog ?? '0';
+  } catch(err) {
+    console.error("Failed to load dashboard summary:", err);
+  }
+}
+
+async function loadRecentQuotes() {
+  const tbody = document.getElementById("recentQuotes");
+  try {
+    const res = await fetch('https://dreamspace-backend.onrender.com/api/quotes?limit=5');
+    const quotes = await res.json();
+
+    console.log("Recent quotes fetched:", quotes); // Debug log
+
+    if (!quotes || quotes.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="muted centered">No recent quotes.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = quotes.map(q => {
+      // Safely get status from possible field names
+      const status = q.status ?? q.quoteStatus ?? 'Pending';
+      const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+
+      return `
+        <tr>
+          <td>${q._id?.slice(-6) || '-'}</td>
+          <td>${formattedStatus}</td>
+          <td>₱${(q.grandTotal ?? 0).toLocaleString()}</td>
+          <td>${new Date(q.createdAt).toLocaleDateString()}</td>
+        </tr>
+      `;
+    }).join('');
+  } catch (err) {
+    console.error("Failed to load recent quotes:", err);
+    tbody.innerHTML = '<tr><td colspan="4" class="muted centered">Failed to load data.</td></tr>';
+  }
+}
+
+function logout(){
+  localStorage.removeItem("authToken");
+  window.location.href="login.html";
+}
+
+function makeCardsClickable(){
+  document.querySelectorAll('.small-card[data-link]').forEach(card=>{
+    card.addEventListener('click',()=>window.location.href=card.dataset.link);
+  });
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  loadDashboardData();
+  loadRecentQuotes();
+  makeCardsClickable();
+});
+</script>
+</body>
+</html>

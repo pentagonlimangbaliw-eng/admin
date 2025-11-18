@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DreamSpace Admin — Saved Designs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ✅ Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+  >
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      background: linear-gradient(135deg, #f7f8fc 0%, #eef1f9 100%);
+      color: #222;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* === SIDEBAR === */
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(180deg, #5e4ad1, #372a7f);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 1rem;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar .brand {
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .nav-links {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      color: #f4f4f4;
+      font-weight: 500;
+      transition: background 0.25s, transform 0.15s;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(4px);
+    }
+
+    .nav-links a.active {
+      background: rgba(255, 255, 255, 0.3);
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      background: #ff4d4d;
+      border: none;
+      color: white;
+      padding: 0.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: auto;
+    }
+
+    .logout-btn:hover {
+      background: #c1121f;
+      transform: scale(1.03);
+    }
+
+    /* === MAIN === */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2.5rem;
+    }
+
+    h1 { color: #372a7f; margin-bottom: 0.5rem; }
+
+    .muted { color: #555; font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e3e3e3;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .card-header h2 {
+      color: #372a7f;
+      margin: 0;
+    }
+
+    .print-btn {
+      background: #372a7f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: 0.25s;
+    }
+
+    .print-btn:hover {
+      background: #2a1d6d;
+    }
+
+    #designsList {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    .design-card {
+      background: #fff;
+      border-left: 6px solid #372a7f;
+      border-radius: 14px;
+      padding: 1.25rem;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .design-card:hover {
+      background: linear-gradient(135deg, #f9faff 0%, #eef1ff 100%);
+      transform: translateY(-6px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .design-preview {
+      background: #e9edff;
+      border-radius: 10px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #372a7f;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .design-details p {
+      margin: 0.25rem 0;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .design-actions {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+    }
+
+    .btn {
+      flex: 1;
+      text-align: center;
+      background: #372a7f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 0;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: 0.25s;
+    }
+
+    .btn-del { background: #e63946; }
+    .btn:hover { background: #2a1d6d; }
+    .btn-del:hover { background: #c1121f; }
+
+    .empty {
+      text-align: center;
+      color: #666;
+      font-size: 1rem;
+      padding: 2rem;
+    }
+  </style>
+
+  <script src="scripts/api.js"></script>
+  <script src="scripts/auth.js"></script>
+</head>
+
+<body onload="auth.requireAuth(); designs.loadDesigns();">
+
+  <!-- 🧭 SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">DreamSpace Admin</div>
+
+    <nav class="nav-links">
+      <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="catalog.html"><i class="bi bi-box-seam"></i> Catalog</a>
+      <a href="quotes.html"><i class="bi bi-chat-left-text"></i> Quotes</a>
+      <a href="designs.html" class="active"><i class="bi bi-palette2"></i> Designs</a>
+      <a href="reset.html"><i class="bi bi-arrow-repeat"></i> Reset</a>
+    </nav>
+
+    <button class="logout-btn" onclick="auth.logout(); location='index.html'">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </button>
+  </aside>
+
+  <!-- 📄 MAIN CONTENT -->
+  <main class="main">
+    <h1>Saved Designs</h1>
+    <p class="muted">View and manage designs created by users.</p>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>Design Library</h2>
+        <button class="print-btn" onclick="designs.printDesigns()">
+          <i class="bi bi-printer"></i> Print
+        </button>
+      </div>
+      <div id="designsList">Loading…</div>
+    </section>
+  </main>
+
+  <script>
+   window.designs = {
+  async loadDesigns() {
+    const container = document.getElementById('designsList');
+    container.innerHTML = 'Loading designs…';
+    try {
+      const data = await api.designs.getRecent();
+      if (!data || !data.length) {
+        container.innerHTML = '<div class="empty">No designs found yet.</div>';
+        return;
+      }
+
+      container.innerHTML = data.map(d => {
+        // Preview: Cloudinary image if available, otherwise show roomType text
+        const previewHtml = d.screenshotUrl
+          ? `<div class="design-preview" style="
+                background-image: url('${d.screenshotUrl}');
+                background-size: cover;
+                background-position: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: bold;
+                font-size: 1.1rem;
+                text-shadow: 0 0 5px rgba(0,0,0,0.5);
+              ">${d.roomType || ''}</div>`
+          : `<div class="design-preview">${d.roomType || 'Preview'}</div>`;
+
+        return `
+          <div class="design-card">
+            ${previewHtml}
+            <div class="design-details">
+              <h4>${d.name || 'Untitled Design'}</h4>
+              <p><strong>User:</strong> ${d.userId?.name || 'N/A'}</p>
+              <p><strong>Created:</strong> ${new Date(d.createdAt).toLocaleString()}</p>
+            </div>
+            <div class="design-actions">
+              <button class="btn" onclick="designs.viewDesign('${d._id}')">View</button>
+              <button class="btn btn-del" onclick="designs.deleteDesign('${d._id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (e) {
+      console.error(e);
+      container.innerHTML = `<div class="empty" style="color:red;">Failed to load designs.</div>`;
+    }
+  },
+
+  async deleteDesign(id) {
+    if (!confirm('Are you sure you want to delete this design?')) return;
+    try {
+      await api.designs.delete(id);
+      this.loadDesigns();
+    } catch (err) {
+      alert('Failed to delete design');
+      console.error(err);
+    }
+  },
+
+  viewDesign(id) {
+    location.href = `design-view.html?id=${id}`;
+  },
+
+  printDesigns() {
+    const container = document.getElementById("designsList");
+    const cards = container.querySelectorAll(".design-card");
+    if (!cards.length) return alert("No designs to print.");
+
+    let rows = "";
+    cards.forEach(card => {
+      const roomType = card.querySelector(".design-preview")?.innerText || "N/A";
+      const designName = card.querySelector("h4")?.innerText || "Untitled Design";
+      const user = card.querySelector("p strong")?.nextSibling?.textContent.trim() || "N/A";
+      const created = [...card.querySelectorAll("p")].find(p => p.textContent.includes("Created"))?.textContent.replace("Created:", "").trim() || "N/A";
+      rows += `<tr><td>${roomType}</td><td>${designName}</td><td>${user}</td><td>${created}</td></tr>`;
+    });
+
+    const html = `
+      <html>
+        <head>
+          <title>All Designs</title>
+          <style>
+            @page { margin: 20mm; size: A4; }
+            body { font-family: "Segoe UI", Arial, sans-serif; margin: 30px; color: #222; }
+            .company-name { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 10px; }
+            .company-name .blue { color: #1E3A8A; } .company-name .red { color: #d62828; }
+            .header { text-align: center; margin-bottom: 20px; }
+            .logo { width: 100px; margin-bottom: 5px; }
+            table { width: 100%; border-collapse: collapse; font-size: 14px; }
+            th, td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; }
+            th { background-color: #372a7f; color: white; }
+          </style>
+        </head>
+        <body>
+          <div class="company-name">
+            <span class="blue">Better Living</span>
+            <span class="red"> Tile</span>
+            <span class="blue"> and </span>
+            <span class="red">Bath</span>
+            <span class="blue"> Center</span>
+          </div>
+          <div class="header">
+            <img src="imagesIcons/bg.png" alt="DreamSpace Logo" class="logo">
+            <h2>All Designs</h2>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Room Type</th>
+                <th>Design Name</th>
+                <th>User</th>
+                <th>Created Date</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </body>
+      </html>
+   
+};
+</script>
+</body>
+</html>

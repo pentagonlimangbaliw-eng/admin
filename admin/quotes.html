@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DreamSpace Admin — Quotes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="images/favicon.png" type="image/png">
+
+  <!-- ✅ Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+  >
+
+  <style>
+    /* === RESET & GLOBAL === */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      background: linear-gradient(135deg, #f7f8fc 0%, #eef1f9 100%);
+      color: #222;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* === SIDEBAR === */
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(180deg, #5e4ad1, #372a7f);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 1rem;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar .brand {
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      color: #f4f4f4;
+      font-weight: 500;
+      transition: background 0.25s, transform 0.15s;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(4px);
+    }
+
+    .nav-links a.active {
+      background: rgba(255, 255, 255, 0.3);
+      font-weight: 600;
+    }
+
+    .nav-links i {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .logout-btn {
+      background: #ff4d4d;
+      border: none;
+      color: white;
+      padding: 0.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: auto;
+    }
+
+    .logout-btn:hover {
+      background: #c1121f;
+      transform: scale(1.03);
+    }
+
+    /* === MAIN === */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2.5rem;
+    }
+
+    h1 {
+      color: #372a7f;
+      margin-bottom: 0.5rem;
+    }
+
+    .muted {
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    /* === CARD === */
+    .card {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      transition: 0.3s ease;
+    }
+
+    .card:hover {
+      background: #f7f9ff;
+    }
+
+    .card h2 {
+      color: #372a7f;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      background: #372a7f;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.25s;
+    }
+
+    .btn:hover {
+      background: #2a1d6d;
+    }
+
+    /* === TABLE === */
+    #quotesListContainer {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+      min-width: 700px;
+    }
+
+    thead {
+      background: #372a7f;
+      color: white;
+    }
+
+    th, td {
+      padding: 0.9rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e5e5;
+      font-size: 0.95rem;
+    }
+
+    td button {
+      margin-right: 0.4rem;
+    }
+
+    .action-btn {
+      padding: 0.4rem 0.9rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .view-btn {
+      background: #0077b6;
+      color: white;
+    }
+
+    .view-btn:hover {
+      background: #005b8a;
+    }
+
+    .delete-btn {
+      background: #ff4d4d;
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background: #c1121f;
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .nav-links {
+        flex-direction: row;
+        gap: 0.5rem;
+      }
+      .logout-btn {
+        margin-top: 0;
+      }
+    }
+  </style>
+</head>
+
+<body onload="auth && auth.requireAuth && auth.requireAuth()">
+
+  <!-- 🧭 SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">DreamSpace Admin</div>
+
+    <nav class="nav-links">
+      <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="catalog.html"><i class="bi bi-box-seam"></i> Catalog</a>
+      <a href="quotes.html" class="active"><i class="bi bi-chat-left-text"></i> Quotes</a>
+      <a href="designs.html"><i class="bi bi-palette2"></i> Designs</a>
+      <a href="reset.html"><i class="bi bi-arrow-repeat"></i> Reset</a>
+    </nav>
+
+    <button class="logout-btn" onclick="auth.logout(); location='index.html'">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </button>
+  </aside>
+
+  <!-- 💬 MAIN QUOTES SECTION -->
+  <main class="main">
+    <h1>Quotes Management</h1>
+    <p class="muted">Manage all client quote requests from the DreamSpace kiosk.</p>
+
+    <section class="card">
+      <div class="row">
+        <h2>All Quotes</h2>
+        <div style="display:flex; gap:0.5rem; flex-wrap: wrap;">
+          <button class="btn" onclick="printQuotes()">🖨️ Print</button>
+        </div>
+      </div>
+
+      <div id="quotesListContainer">
+        <table id="quotesTable">
+          <thead>
+            <tr>
+              <th>Client Name</th>
+              <th>Email</th>
+              <th>Project Type</th>
+              <th>Date Requested</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="quotesList">
+            <tr><td colspan="6" style="text-align:center;">Loading quotes…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="scripts/api.js"></script>
+  <script src="scripts/auth.js"></script>
+  <script>
+window.quotes = {};
+quotes.loadQuotes = async function() {
+  const tbody = document.getElementById("quotesList");
+  tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Loading quotes…</td></tr>`;
+
+  try {
+    const quotesDataRaw = await api.quotes.get();
+    console.log("Quotes response:", quotesDataRaw);
+
+    // ensure array
+    const quotesData = Array.isArray(quotesDataRaw) ? quotesDataRaw : quotesDataRaw.quotes || [];
+    
+    // store globally for viewQuote
+    window.quotesData = quotesData;
+
+    if (!quotesData.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No quotes found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = quotesData.map(q => `
+      <tr>
+        <td>${q.userId?.name || '—'}</td>
+        <td>${q.userId?.email || '—'}</td>
+        <td>${q.roomType || '—'}</td>
+        <td>${new Date(q.createdAt).toLocaleDateString()}</td>
+        <td>${q.status || 'draft'}</td>
+        <td>
+          <button class="action-btn view-btn" onclick="quotes.viewQuote('${q._id}')"><i class='bi bi-eye'></i> View</button>
+          <button class="action-btn delete-btn" onclick="quotes.deleteQuote('${q._id}')"><i class='bi bi-trash3'></i> Delete</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    console.error("❌ Error loading quotes:", err);
+    tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">Failed to load quotes.</td></tr>`;
+  }
+};
+
+quotes.viewQuote = function(id) {
+  const quote = window.quotesData?.find(q => q._id === id);
+  if (!quote) return alert("❌ Quote not found.");
+
+  const itemsList = quote.items?.map(i => 
+    `• ${i.name || 'Unnamed item'} — ₱${i.price?.toLocaleString() || 0} x ${i.quantity} = ₱${(i.price * i.quantity)?.toLocaleString() || 0}`
+  ).join('\n') || '• No items';
+
+  alert(`
+Client: ${quote.userId?.name || '—'}
+Email: ${quote.userId?.email || '—'}
+Project: ${quote.roomType || '—'}
+Subtotal: ₱${quote.subtotal?.toLocaleString() || 0}
+Discount: ₱${quote.discount?.toLocaleString() || 0}
+Grand Total: ₱${quote.grandTotal?.toLocaleString() || 0}
+
+Items:
+${itemsList}
+  `);
+};
+
+quotes.deleteQuote = async function(id) {
+  if (!confirm("Are you sure you want to delete this quote?")) return;
+  try {
+    await api.quotes.delete(id);
+    alert("🗑️ Quote deleted successfully.");
+    quotes.loadQuotes();
+  } catch (err) {
+    console.error(err);
+    alert("❌ Failed to delete quote: " + (err.message || "Unknown error"));
+  }
+};
+
+window.addEventListener("DOMContentLoaded", quotes.loadQuotes);
+
+function printQuotes() {
+  const tableClone = document.getElementById("quotesTable").cloneNode(true);
+
+  // Remove the "Actions" column
+  for (const row of tableClone.rows) {
+    row.deleteCell(-1);
+  }
+
+  const htmlContent = `
+    <html>
+      <head>
+        <title>All Quotes</title>
+        <style>
+          @page { margin: 20mm; size: A4; }
+          body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 30px;
+            color: #222;
+          }
+          .company-name {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+          }
+          .company-name .blue {
+            color: #1E3A8A;
+          }
+          .company-name .red {
+            color: #d62828;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 20px;
+          }
+          .logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 5px;
+          }
+          h2 {
+            text-align: center;
+            margin: 10px 0;
+            color: #222;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+          }
+          th, td {
+            border: 1px solid #ccc;
+            padding: 8px 10px;
+            text-align: left;
+          }
+          th {
+            background-color: #372a7f;
+            color: white;
+          }
+          a {
+            color: #007bff;
+            text-decoration: none;
+          }
+          a:hover {
+            text-decoration: underline;
+          }
+          @media print {
+            button { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="company-name">
+          <span class="blue">Better Living</span>
+          <span class="red"> Tile</span>
+          <span class="blue"> and </span>
+          <span class="red">Bath</span>
+          <span class="blue"> Center</span>
+        </div>
+        <div class="header">
+          <img src="imagesIcons/bg.png" alt="DreamSpace Logo" class="logo">
+          <h2>All Quotes</h2>
+        </div>
+        ${tableClone.outerHTML}
+      </body>
+    </html>
+  `;
+
+  const printWindow = window.open('', '', 'width=900,height=700');
+  printWindow.document.open();
+  printWindow.document.write(htmlContent);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+}
+
+
+</script>
+
+
+</body>
+</html>
