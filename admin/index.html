@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DreamSpace Admin Login</title>
+  <title>DreamSpace</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -44,7 +44,7 @@
     }
     input {
       width: 100%;
-      padding: 12px;
+      padding: 12px 40px 12px 12px;
       border: none;
       border-radius: 8px;
       outline: none;
@@ -54,15 +54,24 @@
       transition: box-shadow 0.2s ease;
     }
     input:focus { box-shadow: 0 0 0 2px #00b4d8; }
+
+    /* Eye toggle button */
     .toggle-eye {
       position: absolute;
-      right: 12px;
       top: 50%;
+      right: 12px;
       transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
       cursor: pointer;
-      font-size: 18px;
-      color: #555;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>') no-repeat center;
+      background-size: contain;
     }
+    .toggle-eye.hide {
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94C16.13 19.25 14.11 20 12 20c-7 0-11-8-11-8s1.95-3.3 5-5.6M1 1l22 22"/></svg>') no-repeat center;
+      background-size: contain;
+    }
+
     .btn {
       width: 100%;
       padding: 12px;
@@ -103,7 +112,7 @@
       <label for="password">Password</label>
       <div class="input-container">
         <input type="password" id="password" placeholder="Enter password" required />
-        <span class="toggle-eye" id="togglePassword">&#128065;</span> <!-- Eye icon -->
+        <div class="toggle-eye" id="togglePassword"></div>
       </div>
 
       <button type="submit" class="btn">Login</button>
@@ -112,14 +121,14 @@
   </div>
 
   <script>
-    // Toggle password visibility
+    // Password toggle
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
 
     togglePassword.addEventListener('click', () => {
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
-      togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+      togglePassword.classList.toggle('hide');
     });
 
     // Form validation
