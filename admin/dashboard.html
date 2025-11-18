@@ -157,7 +157,7 @@ function logout() {
   const authToken = localStorage.getItem("authToken");
   if (!authToken) {
     alert("You are not currently logged in!");
-    window.location.href = "login.html"; // redirect to login anyway
+    window.location.href = "index.html"; // redirect to login anyway
     return;
   }
 
@@ -168,7 +168,7 @@ function logout() {
   // Remove auth token and redirect
   localStorage.removeItem("authToken");
   alert("You have successfully logged out.");
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 }
 
 function makeCardsClickable(){
