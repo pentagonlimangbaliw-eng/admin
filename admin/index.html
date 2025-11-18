@@ -38,10 +38,13 @@
       font-size: 14px;
       opacity: 0.9;
     }
+    .input-container {
+      position: relative;
+      margin-bottom: 15px;
+    }
     input {
       width: 100%;
       padding: 12px;
-      margin-bottom: 15px;
       border: none;
       border-radius: 8px;
       outline: none;
@@ -51,6 +54,15 @@
       transition: box-shadow 0.2s ease;
     }
     input:focus { box-shadow: 0 0 0 2px #00b4d8; }
+    .toggle-eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      color: #555;
+    }
     .btn {
       width: 100%;
       padding: 12px;
@@ -89,7 +101,10 @@
       <input type="email" id="email" placeholder="Enter your email" required />
 
       <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Enter password" required />
+      <div class="input-container">
+        <input type="password" id="password" placeholder="Enter password" required />
+        <span class="toggle-eye" id="togglePassword">&#128065;</span> <!-- Eye icon -->
+      </div>
 
       <button type="submit" class="btn">Login</button>
     </form>
@@ -97,25 +112,31 @@
   </div>
 
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault(); // prevent form submission
+    // Toggle password visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
 
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
+    });
+
+    // Form validation
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
       const errorMsg = document.getElementById('errorMsg');
 
-      // Clear previous error
       errorMsg.textContent = '';
 
-      // Validate all fields are filled
       if (!email || !password) {
         errorMsg.textContent = 'Please fill in all fields.';
         return;
       }
 
-      // Validate credentials
       if (email === 'pentagon@gmail.com' && password === 'Penta12345') {
-        // Redirect to dashboard if valid
         window.location.href = 'dashboard.html';
       } else {
         errorMsg.textContent = 'Invalid email or password.';
