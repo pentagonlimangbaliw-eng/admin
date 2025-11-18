@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -51,8 +51,6 @@ h1{color:#372a7f;margin-bottom:.5rem;font-size:1.8rem}
 .tile{display:block;background:linear-gradient(135deg,#584aac,#372a7f);color:white;padding:1rem;text-align:center;border-radius:10px;font-weight:500;transition:.25s;box-shadow:0 2px 6px rgba(0,0,0,.1)}
 .tile i{display:block;font-size:1.6rem;margin-bottom:.4rem}
 .tile:hover{background:linear-gradient(135deg,#6e5be9,#493b9c);transform:translateY(-3px)}
-input, textarea{font-family:"Segoe UI",Arial,sans-serif;border:1px solid #ccc;padding:.5rem;border-radius:6px;width:100%}
-input:invalid, textarea:invalid{border-color:red}
 footer{text-align:center;margin-top:2rem;color:#777;font-size:.9rem}
 @media(max-width:768px){body{flex-direction:column}.sidebar{width:100%;flex-direction:row;justify-content:space-between;align-items:center}.nav-links{flex-direction:row;gap:.5rem}.logout-btn{margin-top:0}.dashboard-grid{grid-template-columns:1fr}}
 </style>
@@ -100,26 +98,6 @@ footer{text-align:center;margin-top:2rem;color:#777;font-size:.9rem}
 <a href="reset.html" class="tile"><i class="bi bi-arrow-repeat"></i>Reset</a>
 </div>
 </section>
-
-<section class="card">
-<h2><i class="bi bi-plus-circle"></i> Add Catalog Item</h2>
-<form id="catalogForm">
-  <div style="margin-bottom:1rem;">
-    <label>Name</label>
-    <input type="text" id="itemName" placeholder="Item name" required>
-  </div>
-  <div style="margin-bottom:1rem;">
-    <label>Price</label>
-    <input type="number" id="itemPrice" placeholder="₱0.00" required min="0">
-  </div>
-  <div style="margin-bottom:1rem;">
-    <label>Description</label>
-    <textarea id="itemDesc" placeholder="Item description" required></textarea>
-  </div>
-  <button type="submit" class="tile" style="background:#5e4ad1">Add Item</button>
-</form>
-</section>
-
 </div>
 
 <footer>© 2025 DreamSpace Admin Dashboard</footer>
@@ -144,15 +122,21 @@ async function loadDashboardData(){
 async function loadRecentQuotes() {
   const tbody = document.getElementById("recentQuotes");
   try {
-    const res = await fetch(`${BASE_URL}/api/quotes?limit=5`);
+    const res = await fetch('https://dreamspace-backend.onrender.com/api/quotes?limit=5');
     const quotes = await res.json();
+
+    console.log("Recent quotes fetched:", quotes); // Debug log
+
     if (!quotes || quotes.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4" class="muted centered">No recent quotes.</td></tr>';
       return;
     }
+
     tbody.innerHTML = quotes.map(q => {
+      // Safely get status from possible field names
       const status = q.status ?? q.quoteStatus ?? 'Pending';
       const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+
       return `
         <tr>
           <td>${q._id?.slice(-6) || '-'}</td>
@@ -168,44 +152,30 @@ async function loadRecentQuotes() {
   }
 }
 
-function logout(){
-  if (!localStorage.getItem("authToken")) {
-    alert("You are already logged out.");
-    window.location.href = "login.html";
+function logout() {
+  // Check if user is logged in
+  const authToken = localStorage.getItem("authToken");
+  if (!authToken) {
+    alert("You are not currently logged in!");
+    window.location.href = "login.html"; // redirect to login anyway
     return;
   }
 
+  // Optional confirmation before logout
   const confirmLogout = confirm("Are you sure you want to logout?");
-  if(confirmLogout){
-    localStorage.removeItem("authToken");
-    window.location.href="login.html";
-  }
-}
+  if (!confirmLogout) return;
 
+  // Remove auth token and redirect
+  localStorage.removeItem("authToken");
+  alert("You have successfully logged out.");
+  window.location.href = "login.html";
+}
 
 function makeCardsClickable(){
   document.querySelectorAll('.small-card[data-link]').forEach(card=>{
     card.addEventListener('click',()=>window.location.href=card.dataset.link);
   });
 }
-
-// Catalog form validation & submission
-document.getElementById('catalogForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  const name = document.getElementById('itemName').value.trim();
-  const price = parseFloat(document.getElementById('itemPrice').value);
-  const desc = document.getElementById('itemDesc').value.trim();
-
-  if(!name || !desc || isNaN(price) || price < 0){
-    alert("Please fill all fields correctly.");
-    return;
-  }
-
-  // Mock submission
-  console.log("Catalog item added:", {name, price, desc});
-  alert(`Item "${name}" added successfully!`);
-  this.reset();
-});
 
 document.addEventListener("DOMContentLoaded",()=>{
   loadDashboardData();
