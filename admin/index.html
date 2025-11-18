@@ -115,7 +115,9 @@
 
       // Validate credentials
       if (email === 'pentagon@gmail.com' && password === 'Penta12345') {
-        // Redirect to dashboard if valid
+        // Store a dummy token to simulate login
+        localStorage.setItem('authToken', 'dummyToken123');
+        // Redirect to dashboard
         window.location.href = 'dashboard.html';
       } else {
         errorMsg.textContent = 'Invalid email or password.';
